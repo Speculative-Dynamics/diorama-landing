@@ -11,4 +11,8 @@ https://speculative-dynamics.github.io/diorama-landing/.
   one-time code from the address bar.
 
 Both pages pin their inline style and script with a Content Security Policy
-hash. If you edit either, recompute the hash or the browser will block it.
+hash, so edit them in `build.py` and run `python3 build.py .` to rewrite the
+pages with fresh hashes.
+
+`icon.png`, `apple-touch-icon.png` and `favicon.png` are the app icon at 512,
+180 and 64 pixels, drawn by `scripts/app_icon.swift` in the Diorama app repo.
