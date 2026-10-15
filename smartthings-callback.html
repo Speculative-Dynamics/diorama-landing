@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-t0tYc7QqUBW2otCSW8LlWHLzrRbEJ9yRQUh/3cCShgI='; style-src 'sha256-eIyAyNUbLBw0Zon3QmwfjScnRZl52zABISrgkNhjUxQ='; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>Returning to Diorama</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    box-sizing: border-box;
+    background: #09090B;
+    color: #F4F4F6;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    text-align: center;
+  }
+  main { max-width: 420px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 10px; }
+  p { color: #A8A8B0; font-size: 15px; line-height: 1.5; margin: 0; }
+  a { color: #D6D6DC; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Returning to Diorama…</h1>
+  <p id="message">If nothing happens, <a id="open" href="#">tap here to open the app</a>.</p>
+</main>
+<script>
+  // SmartThings only redirects to https pages, so this page hands the
+  // sign-in result to the Diorama app. It forwards only the OAuth "code",
+  // "state" and "error" values, checked against strict patterns, to a
+  // fixed app address. Nothing is stored or sent anywhere else.
+  (function () {
+    var allowed = { code: /^[A-Za-z0-9._~-]{1,512}$/, state: /^[A-Za-z0-9-]{1,128}$/, error: /^[a-z_]{1,64}$/ };
+    var incoming = new URLSearchParams(window.location.search);
+    var outgoing = new URLSearchParams();
+    Object.keys(allowed).forEach(function (name) {
+      var value = incoming.get(name);
+      if (value !== null && allowed[name].test(value)) outgoing.set(name, value);
+    });
+    // Keep the one-time code out of the address bar and browser history.
+    window.history.replaceState(null, "", window.location.pathname);
+
+    if (!outgoing.has("state") || (!outgoing.has("code") && !outgoing.has("error"))) {
+      document.getElementById("title").textContent = "Nothing to do here";
+      document.getElementById("message").textContent = "This page finishes signing in to SmartThings from the Diorama app.";
+      return;
+    }
+    var target = "diorama://smartthings/callback?" + outgoing.toString();
+    document.getElementById("open").setAttribute("href", target);
+    window.location.replace(target);
+  })();
+</script>
+</body>
+</html>
